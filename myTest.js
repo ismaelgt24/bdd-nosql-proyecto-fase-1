@@ -1,7 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
 
-const Producto = require('./schemas').Producto
+
 
 const API_KEY = process.env.RAWG_APIKEY;
 const BASE_URL = process.env.RAWG_API_ENDPOINT;
@@ -179,69 +179,27 @@ const getEmpresas = async () => {
 
 };
 
-const MongoDBClient = require('./servicios/MongoDBClient');
-const GameAPI = require('./servicios/GameAPI');
 
-(async () => {
+let videojuegos = [];
+let plataformas = [];
+let empresas = [];
 
-    const mongoClient = new MongoDBClient(MONGO_URI, MONGO_DB_NAME);
-    const gameAPI = new GameAPI(API_KEY, BASE_URL, PAGE_SIZE);
+const getData = async () => {
 
-    await mongoClient.connect();
+    //Para poder resolver las 3 promesas de forma concurrente:
+    const solictudes = await Promise.all([getVideojuegos(),getPlataformas(),getEmpresas()]);
 
-    //AYUDA: Ejemplo de como insertar un documento haciendo uso del esquema Producto
+    //Separamos los listados captados
+    videojuegos = solictudes[0];
+    plataformas = solictudes[1];
+    empresas = solictudes[2];
 
-    // const response = {
-    //     name: "Leather Jacket",
-    //     price: 120.00,
-    //     tags: ["clothing", "outerwear", "leather"],
-    //     available: true
-    // };
-
-    // const nuevoProducto = new Producto({
-    //     nombre: response.name,
-    //     precio: response.price,
-    //     tags: response.tags,
-    //     disponible: response.available
-    // });
-
-    // await mongoClient.insertar('Productos', nuevoProducto);
-
-
-
-    // Realice las operaciones para insertar los datos aqui y mostrar consultas
-    // >>>>>>>>>>>>
-
-    //Lectura de los datos:
-    let videojuegos = [];
-    let plataformas = [];
-    let empresas = [];
-
-    const getData = async () => {
-
-        //Para poder resolver las 3 promesas de forma concurrente:
-        const solictudes = await Promise.all([getVideojuegos(),getPlataformas(),getEmpresas()]);
-
-        //Separamos los listados captados
-        videojuegos = solictudes[0];
-        plataformas = solictudes[1];
-        empresas = solictudes[2];
-
-    }
-
-    await getData(); //Para esperar que termine la lectura de datos.
-    
-    //Christian, lo Recomendable  es colocar de este punto en adelante las inserciones para facilitar la secuencialidad con JS
+    //Testing:
     console.log(`hemos captado ${videojuegos.length} Videojuegos`);
     console.log(`hemos captado ${plataformas.length} Plataformas`);
     console.log(`hemos captado ${empresas.length} Empresas`);
-    // >>>>>>>>>>>>
+}
 
-    await mongoClient.close();
-    
-})();
+getData();
 
 
-
-
-// obtenerListaDeJuegos();
