@@ -129,28 +129,40 @@ class MongoDBClient {
 
   async consulta2(empresas, fechaInicio, fechaFin) {
     const videojuegosCollection = this.db.collection("Videojuegos");
-    const empresasCollection = this.db.collection("Empresas");
-    const empresaIds = await empresasCollection
-      .find({
-        nombre: { $in: empresas },
-      })
-      .map((emp) => emp._id)
-      .toArray();
-    const fechaInicioDate = new Date(fechaInicio);
-    const fechaFinDate = new Date(fechaFin);
-
     const videojuegos = await videojuegosCollection
-      .find({
-        empresa: { $in: empresaIds },
-        fechaLanzamiento: {
-          $gte: fechaInicioDate,
-          $lte: fechaFinDate,
+      .aggregate(
+        {
+          $lookup: {
+            from: "Empresas",
+            localField: "empresa",
+            foreignField: "_id",
+            as: "empresa_info",
+          },
         },
-      })
+        {
+          $unwind: "$empresa_info",
+        },
+        {
+          $match: {
+            "empresa_info.nombre": { $in: empresas },
+            fechaLanzamiento: {
+              $gte: new Date(fechaInicio),
+              $lte: new Date(fechaFin),
+            },
+          },
+        },
+        {
+          $project: {
+            nombre: 1,
+            fechaLanzamiento: 1,
+            empresa: "$empresa_info.nombre",
+          },
+        }
+      )
       .project({
         nombre: 1,
         fechaLanzamiento: 1,
-        empresa: 1,
+        empresa: "$empresa_info.nombre",
       })
       .toArray();
     return videojuegos;
@@ -276,6 +288,22 @@ class MongoDBClient {
                 },
               },
             },
+          },
+        },
+        // campos para para mostrar
+        {
+          $unwind: "$videojuegos",
+        },
+        {
+          $replaceRoot: { newRoot: "$videojuegos" },
+        },
+        {
+          $project: {
+            _id: 1,
+            nombre: 1,
+            valoracion: 1,
+            generos: 1,
+            promedio: "$promedio",
           },
         }
       )

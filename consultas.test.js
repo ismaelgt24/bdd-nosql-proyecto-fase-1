@@ -28,7 +28,7 @@ describe("Consultas", () => {
   test("Consulta 2: Devuelve un array con juegos lanzados entre fechas, de n empresas", async () => {
     const empresas = ["Kernel Kaput", "The Hit Squad"]; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
     const fechaInicio = "01/01/2002"; // Agregar fecha por ejemplo 1/10/2012
-    const fechaFin = "10/02/2020"; // Agregar fecha por ejemplo 5/10/2022
+    const fechaFin = "10/02/2009"; // Agregar fecha por ejemplo 5/10/2022
     const result = await client.consulta2(empresas, fechaInicio, fechaFin);
     console.info("Consulta 2: ", result);
     expect(result).toBeInstanceOf(Array);
@@ -41,7 +41,7 @@ describe("Consultas", () => {
     expect(result).toBeInstanceOf(Array);
     expect(result).not.toEqual([]);
   });
-  test("Consulta 4: Retorna un  juegos por n empresas desarrolladoras con valoración mayor a x", async () => {
+  test("Consulta 4: Retorna juegos por n empresas desarrolladoras con valoración mayor a x", async () => {
     const empresas = [
       "Kernel Kaput",
       "The Hit Squad",
@@ -54,7 +54,7 @@ describe("Consultas", () => {
     expect(result).not.toEqual([]);
   });
   test("Consulta 5: Retorna juegos con una calificación mayor al promedio y que tengan mas de n generos", async () => {
-    const cantidadDeGeneros = 2; // Agregar un numero, por ejemplo 3
+    const cantidadDeGeneros = 3; // Agregar un numero, por ejemplo 3
     const result = await client.consulta5(cantidadDeGeneros);
     console.info("Consulta 5: ", result);
     expect(result).toBeInstanceOf(Array);
