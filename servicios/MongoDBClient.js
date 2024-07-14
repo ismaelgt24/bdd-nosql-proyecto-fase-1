@@ -397,15 +397,7 @@ class MongoDBClient {
       .aggregate(
         {
           $match: {
-            generos: { $in: generos },
-          },
-        },
-        {
-          $unwind: "$generos",
-        },
-        {
-          $match: {
-            generos: { $in: generos },
+            generos: { $all: generos },
           },
         },
         {
@@ -459,7 +451,41 @@ class MongoDBClient {
 
   async consulta10(generos, plataformas) {
     const videojuegosCollection = this.db.collection("Videojuegos");
-    const videojuegos = await videojuegosCollection.aggregate().toArray();
+    const videojuegos = await videojuegosCollection
+      .aggregate(
+        {
+          $match: {
+            // generos: { $in: generos }, //almenos un genero
+            generos: { $all: generos }, //todos los generos
+          },
+        },
+        {
+          $lookup: {
+            from: "Plataformas",
+            localField: "plataformas",
+            foreignField: "_id",
+            as: "plataformas_info",
+          },
+        },
+        {
+          $match: {
+            "plataformas_info.nombre": { $in: plataformas },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            nombre: 1,
+            plataformas: "$plataformas_info.nombre",
+          },
+        }
+      )
+      .project({
+        _id: 0,
+        nombre: 1,
+        plataformas: "$plataformas_info.nombre",
+      })
+      .toArray({});
     return videojuegos;
   }
 }

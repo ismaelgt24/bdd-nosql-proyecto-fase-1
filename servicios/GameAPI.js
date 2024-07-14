@@ -7,91 +7,40 @@ class GameAPI {
     this.pageSize = pageSize;
   }
 
-  async obtenerListaDeEmpresas() {
+  async obtenerVideoJuego(id) {
     try {
-      const response = await axios.get(`${this.baseUrl}companies/`, {
+      const response = await axios.get(`${this.baseUrl}games/${id}`, {
         params: {
-          api_key: this.apiKey,
-          format: "json",
-          limit: this.pageSize,
+          key: this.apiKey,
         },
       });
-      return response.data.results.map((company) => ({ nombre: company.name }));
-      //   console.log(response.data.results);
-    } catch (error) {
-      console.error("Error al obtener empresas", error);
-      return [];
+      return response.data;
+    } catch (err) {
+      console.error("Error al obtener empresa", err);
+      return null;
     }
   }
 
-  async obtenerListaDePlataformas() {
+  async obtenerListaDeVideoJuegos() {
+    let allGames = [];
+    let maxPage = 10;
+
     try {
-      const response = await axios.get(`${this.baseUrl}platforms/`, {
-        params: {
-          api_key: this.apiKey,
-          format: "json",
-          limit: this.pageSize,
-        },
-      });
-      return response.data.results.map((platform) => ({
-        nombre: platform.name,
-      }));
-    } catch (error) {
-      console.error("Error al obtener empresas", error);
-      return [];
-    }
-  }
+      for (let i = 1; i <= maxPage; ++i) {
+        const response = await axios.get(`${this.baseUrl}games`, {
+          params: {
+            key: this.apiKey,
+            page: i,
+            page_size: this.pageSize,
+          },
+        });
 
-  obtenerGenerosAleatorios(generos, cantidad) {
-    const generosSeleccionados = [];
-    const indicesUsados = new Set();
-
-    while (generosSeleccionados.length < cantidad) {
-      const indiceAleatorio = Math.floor(Math.random() * generos.length);
-      if (!indicesUsados.has(indiceAleatorio)) {
-        generosSeleccionados.push(generos[indiceAleatorio]);
-        indicesUsados.add(indiceAleatorio);
+        allGames = allGames.concat(response.data.results);
       }
-    }
 
-    return generosSeleccionados;
-  }
-
-  async obtenerListaDeJuegos(empresas, plataformas, generosDisponibles) {
-    try {
-      const response = await axios.get(`${this.baseUrl}games/`, {
-        params: {
-          api_key: this.apiKey,
-          format: "json",
-          limit: this.pageSize,
-        },
-      });
-
-      return response.data.results.map((game) => ({
-        nombre: game.name,
-        fechaLanzamiento: game.date_added
-          ? new Date(game.date_added)
-          : new Date(),
-        generos: this.obtenerGenerosAleatorios(
-          generosDisponibles,
-          Math.floor(Math.random() * 3) + 1
-        ),
-        plataformas: game.platforms
-          .filter((platform) =>
-            plataformas.some((p) => p.nombre === platform.name)
-          )
-          .map(
-            (platform) =>
-              plataformas.find((p) => p.nombre === platform.name)._id
-          ),
-        empresa: empresas[Math.floor(Math.random() * empresas.length)]._id,
-        valoracion: parseFloat((Math.random() * 10).toFixed(1)),
-        etiquetas: game.image_tags
-          ? game.image_tags.map((tag) => tag.name)
-          : [],
-      }));
+      return allGames;
     } catch (error) {
-      console.error("Error al obtener empresas", error);
+      console.error("Error al obtener videojuegos", error);
       return [];
     }
   }
