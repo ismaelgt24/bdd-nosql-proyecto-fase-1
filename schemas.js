@@ -35,8 +35,43 @@ const Producto = mongoose.model('Producto', productoSchema);
 
 
 const videojuegoSchema = new mongoose.Schema({
-  // Define las estructura de los documentos videojuegos aqui
-
+  id: { type: Number, required: true },
+  slug: { type: String, required: true },
+  name: { type: String, required: true },
+  released: { type: Date },
+  rating: { type: Number },
+  rating_top: { type: Number },
+  ratings: [{
+    title: { type: String },
+    count: { type: Number },
+    percent: { type: Number }
+  }],
+  ratings_count: { type: Number },
+  reviews_text_count: { type: Number },
+  added: { type: Number },
+  metacritic: { type: Number },
+  playtime: { type: Number },
+  suggestions_count: { type: Number },
+  updated: { type: Date },
+  reviews_count: { type: Number },
+  platforms: [{
+    id: { type: Number },
+    name: { type: String, minlength: 1, maxlength: 100 },
+    slug: { type: String }
+  }],
+  parent_platforms: [{
+    id: { type: Number },
+    name: { type: String, minlength: 1, maxlength: 100 },
+    slug: { type: String }
+  }],
+  genres: [{
+    name: { type: String },
+    slug: { type: String },
+  }],
+  tags: [{
+    name: { type: String },
+    slug: { type: String, match: /^[a-zA-Z0-9_]+$/ },
+  }],
 });
 
 /**
@@ -47,8 +82,10 @@ const videojuegoSchema = new mongoose.Schema({
 const Videojuego = mongoose.model('Videojuego', videojuegoSchema);
 
 const plataformaScheme = new mongoose.Schema({
-  // Define las estructura de los documentos plataforma aqui
-
+  id: { type: Number, required: true },
+  name: { type: String, required: true },
+  slug: { type: String, required: true },
+  games_count: { type: Number },
 });
 
 /**
@@ -59,8 +96,11 @@ const plataformaScheme = new mongoose.Schema({
 const Plataforma = mongoose.model('Plataforma', plataformaScheme);
 
 const empresaScheme = new mongoose.Schema({
-  // Define las estructura de los documentos empresa aqui
-
+  id: { type: Number, required: true },
+  name: { type: String, required: true },
+  slug: { type: String, required: true },
+  games_count: { type: Number, required: true },
+  games: [{ type: Number }],
 });
 
 /**

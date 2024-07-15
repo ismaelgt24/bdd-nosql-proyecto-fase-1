@@ -198,6 +198,9 @@ const getData = async () => {
     console.log(`hemos captado ${videojuegos.length} Videojuegos`);
     console.log(`hemos captado ${plataformas.length} Plataformas`);
     console.log(`hemos captado ${empresas.length} Empresas`);
+
+
+    //Lo Recomendable Christian es colocar de este punto en adelante las inserciones para
 }
 
 getData();
