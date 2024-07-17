@@ -280,15 +280,9 @@ const GameAPI = require('./servicios/GameAPI');
     await getData(); //Para esperar que termine la lectura de datos.
     
     //Christian, lo Recomendable  es colocar de este punto en adelante las inserciones para facilitar la secuencialidad con JS
-    // console.log(`hemos captado ${videojuegos[0]} Videojuegos`);
-    // console.log(`hemos captado ${JSON.stringify(videojuegos[0], null, 2)} Videojuegos`);
-    // console.log(`hemos captado ${plataformas.length} Plataformas`);
-    // console.log(`hemos captado ${empresas.length} Empresas`);
-
-    // mytest = await getVideojuegosByEmpresa(405);
-
-    // console.log(`hemos captado ${mytest.length} Videojuegos`);
-    // console.log(`hemos captado ${JSON.stringify(mytest[0], null, 2)} Videojuegos`);
+    console.log(`hemos captado ${videojuegos.length} Videojuegos`);
+    console.log(`hemos captado ${plataformas.length} Plataformas`);
+    console.log(`hemos captado ${empresas.length} Empresas`);
 
     // >>>>>>>>>>>>
 
@@ -296,69 +290,83 @@ const GameAPI = require('./servicios/GameAPI');
 
 
 
-// //Inserto las videojuegos
-// for (const juego of videojuegos) {
-//     const nuevoVideojuego = new Videojuego({
-//       id: juego.id,
-//       name: juego.name,
-//       slug: juego.slug,
-//       released: juego.released,
-//       rating: juego.rating,
-//       rating_top: juego.rating_top,
-//       ratings_count: juego.ratings_count,
-//       reviews_text_count: juego.reviews_text_count,
-//       added: juego.added,
-//       metacritic: juego.metacritic,
-//       playtime: juego.playtime,
-//       suggestions_count: juego.suggestions_count,
-//       updated: juego.update,
-//       reviews_count: juego.reviews_count,
-//     });
-//     for (const rat of juego.ratings){//
-//         nuevoVideojuego.ratings.push(rat.title, rat.count, rat.percent);
-//     } 
-//     for (const plat of juego.platforms){//
-//         nuevoVideojuego.platforms.push(plat.id, plat.name, plat.slug);
-//     } 
-//     for (const plat of juego.parent_platforms){//
-//         nuevoVideojuego.parent_platforms.push(plat.id, plat.name, plat.slug);
-//     } 
-//     for (const gen of juego.genres){//
-//         nuevoVideojuego.genres.push(gen.id, gen.name, gen.slug);
-//     } 
-//     for (const tag of juego.tags){//
-//         nuevoVideojuego.tags.push(tag.name, tag.slug);
-//     } 
-//     await mongoClient.insertar('Videojuego', nuevoVideojuego);
-// }
-
-
-// //Inserto las plataformas
-//     for (const plat of plataformas) {
-//         const nuevaPlataforma = new Plataforma({
-//           id: plat.id,
-//           name: plat.name,
-//           slug: plat.slug,
-//           games_count: plat.games_count
-//         });
-//         await mongoClient.insertar('Plataforma', nuevaPlataforma);
-//     }
-// //inserto las empresas
-//     for (const empresa of empresas) {
-//         const nuevaEmpresa = new Empresa({
-//           id: empresa.id,
-//           name: empresa.name,
-//           slug: empresa.slug,
-//           games_count: empresa.games_count,
-//           games: empresa.games.id // linea basura que coloque para mentirle al codigo diciendo que insertaba algo
-//         });
-//         for (const gam of empresa.games){//se insertan los ids de los juegos de cada empresa para poder hacer busquedas posteriores de juegos por empresa desarrolladora
-//             nuevaEmpresa.games.push(gam.id);
-//         }  
-//         await mongoClient.insertar('Empresa', nuevaEmpresa);
-//     }
-
-
+//Inserto las videojuegos
+for (const juego of videojuegos) {
+    const nuevoVideojuego = new Videojuego({
+      id: juego.id,
+      name: juego.name,
+      slug: juego.slug,
+      released: juego.released,
+      rating: juego.rating,
+      rating_top: juego.rating_top,
+      ratings_count: juego.ratings_count,
+      reviews_text_count: juego.reviews_text_count,
+      added: juego.added,
+      metacritic: juego.metacritic,
+      playtime: juego.playtime,
+      suggestions_count: juego.suggestions_count,
+      updated: juego.update,
+      reviews_count: juego.reviews_count,
+      platforms: juego.platforms,
+      DeveloperId: juego.DevId,
+    });
+    for (const rat of juego.ratings){//
+        const aux = {
+            tittle: rat.title,
+            count: rat.count,
+            percent: rat.percent,
+        };
+        nuevoVideojuego.tags.push(aux);
+    } 
+    for (const plat of juego.parent_platforms){//
+        const aux = {
+            id: plat.id,
+            name: plat.name,
+            slug: plat.slug,
+        };
+        nuevoVideojuego.tags.push(aux);
+    } 
+    for (const gen of juego.genres){//
+        const aux = {
+            id: gen.id,
+            name: gen.name,
+            slug: gen.slug,
+        };
+        nuevoVideojuego.tags.push(aux);
+    } 
+    for (const tag of juego.tags){//
+        const aux = {
+            name: tag.name,
+            slug: tag.slug,
+        };
+        nuevoVideojuego.tags.push(aux);
+    }
+    await mongoClient.insertar('Videojuego', nuevoVideojuego);
+}
+//Inserto las plataformas
+    for (const plat of plataformas) {
+        const nuevaPlataforma = new Plataforma({
+          id: plat.id,
+          name: plat.name,
+          slug: plat.slug,
+          games_count: plat.games_count
+        });
+        await mongoClient.insertar('Plataforma', nuevaPlataforma);
+    }
+//inserto las empresas
+    for (const empresa of empresas) {
+        const nuevaEmpresa = new Empresa({
+          id: empresa.id,
+          name: empresa.name,
+          slug: empresa.slug,
+          games_count: empresa.games_count,
+          games: empresa.games.id // linea basura que coloque para mentirle al codigo diciendo que insertaba algo
+        });
+        for (const gam of empresa.games){//se insertan los ids de los juegos de cada empresa para poder hacer busquedas posteriores de juegos por empresa desarrolladora
+            nuevaEmpresa.games.push(gam.id);
+        }  
+        await mongoClient.insertar('Empresa', nuevaEmpresa);
+    }
 
     await mongoClient.close();
 })();

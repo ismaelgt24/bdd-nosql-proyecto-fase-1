@@ -35,6 +35,11 @@ const Producto = mongoose.model('Producto', productoSchema);
 
 
 const videojuegoSchema = new mongoose.Schema({
+  //Estas 2 siguientes referencian a las otras 2 colecciones
+  DeveloperID : {type: Number, required: true },
+  platforms: {type:[Number]},
+  
+  // Demas atributos:
   id: { type: Number, required: true },
   slug: { type: String, required: true },
   name: { type: String, required: true },
@@ -54,11 +59,6 @@ const videojuegoSchema = new mongoose.Schema({
   suggestions_count: { type: Number },
   updated: { type: Date },
   reviews_count: { type: Number },
-  platforms: [{
-    id: { type: Number },
-    name: { type: String, minlength: 1, maxlength: 100 },
-    slug: { type: String }
-  }],
   parent_platforms: [{
     id: { type: Number },
     name: { type: String, minlength: 1, maxlength: 100 },
