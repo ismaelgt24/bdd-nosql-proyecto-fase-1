@@ -19,7 +19,7 @@ afterEach(async () => {
 describe('Consultas', () => {
 
     test('Consulta 1: Devuelve un array con juegos con generos asociados', async () => {
-        const generos = []; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure']
+        const generos = ['Action', 'Adventure']; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure']
         const result = await client.consulta1(generos); 
         console.info('Consulta 1: ', result)
         expect(result).toBeInstanceOf(Array); 
@@ -27,9 +27,13 @@ describe('Consultas', () => {
     });
 
     test('Consulta 2: Devuelve un array con juegos lanzados entre fechas, de n empresas', async () => {
-        const empresas = []; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
-        const fechaInicio = undefined; // Agregar fecha por ejemplo 1/10/2012
-        const fechaFin = undefined; // Agregar fecha por ejemplo 5/10/2022
+
+        //Usaremos las empresas dadas de ejemplo:
+        const empresas = ['Nintendo', 'Activision', 'EA']; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
+
+        //Fechas para juegos del todo el 2023
+        const fechaInicio = new Date(2023, 1, 1); // Agregar fecha por ejemplo 1/10/2012
+        const fechaFin = new Date(2023, 12, 31);; // Agregar fecha por ejemplo 5/10/2022
         const result = await client.consulta2(empresas, fechaInicio, fechaFin); 
         console.info('Consulta 2: ', result)
         expect(result).toBeInstanceOf(Array); 

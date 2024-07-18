@@ -36,7 +36,7 @@ const Producto = mongoose.model('Producto', productoSchema);
 
 const videojuegoSchema = new mongoose.Schema({
   //Estas 2 siguientes referencian a las otras 2 colecciones
-  DeveloperID : {type: Number, required: true },
+  DeveloperID : {type: Number },
   platforms: {type:[Number]},
   
   // Demas atributos:
@@ -73,7 +73,6 @@ const videojuegoSchema = new mongoose.Schema({
     slug: { type: String, match: /^[a-zA-Z0-9_]+$/ },
   }],
 });
-
 /**
  * Modelo de Mongoose para la colección de videojuegos.
  * 

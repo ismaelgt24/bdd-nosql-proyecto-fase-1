@@ -71,7 +71,7 @@ class MongoDBClient {
 
     async insertar(coleccion, model) {
         try {
-            const collection = this.db.collection(coleccion);
+                const collection = this.db.collection(coleccion);
             const result = await collection.insertOne(model.toObject());
             console.log(`Documento insertado con éxito en la colección ${coleccion}:`, result.insertedId);
         } catch (error) {
@@ -99,12 +99,29 @@ class MongoDBClient {
      */
 
     async consulta1(generos){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-       return []
+
+        try{
+            //Validamos que el arreglo pasado no esta vacio
+            if (!generos || !generos.length) {
+                throw new Error("Debes proporcionar una lista de géneros no vacía");
+                return [];
+            }
+
+            //Obtenemos la coleccion:
+            const collection = this.db.collection("Videojuego");
+            
+            // Con este Query garantizamos que para el arreglo de obteneros 'genres'
+            // para cada objeto su atributo name debe estar en el arreglo de nombres pasado por parametros:
+            const query = { genres: { $elemMatch: { name: { $in: generos } } } };
+
+            // Ejecuta la consulta y devuelve los juegos encontrados
+            const r = await collection.find(query).toArray();
+
+            // console.log(r.length)
+            return r;
+        }catch(error){
+            console.log(error.message)
+        }
     }
 
     /**
@@ -113,12 +130,53 @@ class MongoDBClient {
      */
 
     async consulta2(empresas, fechaInicio, fechaFin){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
+
+        try{
+            const collection = this.db.collection("Videojuego");
+
+            let query = {
+                released: {
+                  $gte: startDate,
+                  $lt: endDate
+                },
+
+              };
+
+
+            const r =  collection.aggregate([
+                {
+                  $match: {released: {
+                    $gte: new Date(2000, 1, 1),
+                    $lt: new Date(2023, 12, 31)
+                  }}
+                },
+                {
+                  $lookup: {
+                    from: 'empresas',
+                    localField: 'DeveloperID',
+                    foreignField: 'id',
+                    as: 'developer'
+                  }
+                },
+                {
+                  $unwind: '$developer'
+                },
+                {
+                  $project: {
+                    id: 1,
+                    slug: 1,
+                    name: 1,
+                    developerName: '$developer.name'
+                  }
+                }
+              ]).toArray();
+
+            // console.log(r.length)
+            return r;
+        
+        }catch(error){
+            console.log(error.message)
+        }
 
     }
 
