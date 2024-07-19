@@ -134,42 +134,40 @@ class MongoDBClient {
         try{
             const collection = this.db.collection("Videojuego");
 
-            let query = {
-                released: {
-                  $gte: startDate,
-                  $lt: endDate
+              const r = await collection.aggregate([
+                {   //Todos los juegos cuya fecha de lanzamiento este entre las fechas dadas
+                    $match: {
+                        released: {
+                            $gte: fechaInicio,
+                            $lt: fechaFin
+                        }//,
+                        //DeveloperID: { $in: empresas }
+                    }
                 },
-
-              };
-
-
-            const r =  collection.aggregate([
-                {
-                  $match: {released: {
-                    $gte: new Date(2000, 1, 1),
-                    $lt: new Date(2023, 12, 31)
-                  }}
+                {   //Buscamos asociar cada juego son su empresa desarrolladores
+                    $lookup: {
+                        from: 'Empresa',
+                        localField: 'DeveloperID',
+                        foreignField: 'id',
+                        as: 'Empresa'
+                    }
                 },
-                {
-                  $lookup: {
-                    from: 'empresas',
-                    localField: 'DeveloperID',
-                    foreignField: 'id',
-                    as: 'developer'
-                  }
+                {//Tomamos en cuenta solo las empresas cuyo nombre esten en el array pasado por parametros
+                    $match: {
+                        'Empresa.name': { $in: empresas }
+                    }
                 },
-                {
-                  $unwind: '$developer'
-                },
-                {
-                  $project: {
-                    id: 1,
-                    slug: 1,
-                    name: 1,
-                    developerName: '$developer.name'
-                  }
+                {//Tomamos solamente los atributos relevantes
+                    $project: {
+                        gameID : '$id',
+                        gameSlug : '$slug',
+                        gameName: '$name',
+                        gameReleaseDate : '$released',
+                        EmpresaName: '$Empresa.name',
+                        EmpresaID: 'Empresa.id'
+                    }
                 }
-              ]).toArray();
+            ]).toArray();
 
             // console.log(r.length)
             return r;
@@ -178,7 +176,7 @@ class MongoDBClient {
             console.log(error.message)
         }
 
-    }
+    };
 
     /**
      * Buscar juegos que estén disponibles en más de n plataformas y mostrat tambien cuáles plataformas son.
