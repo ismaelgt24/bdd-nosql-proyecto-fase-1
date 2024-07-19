@@ -65,13 +65,13 @@ describe('Consultas', () => {
         expect(result).not.toEqual([]);
     });
 
-    // test('Consulta 6: Retorna juegos con etiquetas específicas y ordenados por fecha de lanzamientos', async () => {
-    //     const etiquetas = []; // Agregar empresas a esta lista, por ejemplo ['Multiplayer', 'Singleplayer']
-    //     const result = await client.consulta8(etiquetas); 
-    //     console.info('Consulta 6: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 6: Retorna juegos con etiquetas específicas y ordenados por fecha de lanzamientos', async () => {
+        const etiquetas = ['Multiplayer', 'Singleplayer']; // Agregar empresas a esta lista, por ejemplo ['Multiplayer', 'Singleplayer']
+        const result = await client.consulta6(etiquetas); //Decia Consulta 8*
+        console.info('Consulta 6: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
     // test('Consulta 7: Retorna un array con los generos y su valoracion promedi.', async () => {
     //     const generos = []; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']

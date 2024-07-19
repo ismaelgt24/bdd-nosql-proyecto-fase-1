@@ -317,12 +317,54 @@ class MongoDBClient {
      */
 
     async consulta6(etiquetas){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
+        try {
+            // Validamos que el arreglo pasado no esté vacío
+            if (!etiquetas || !etiquetas.length) {
+              throw new Error("Debes proporcionar una lista de etiquetas no vacía");
+              return [];
+            }
+        
+            // Obtenemos la colección
+            const collection = this.db.collection("Videojuego");
+        
+            // Construimos el pipeline de agregación
+            const pipeline = [
+              {
+                // Filtra juegos cuyos nombres esten en el array etiquetas
+                $match: {
+                  tags: { $elemMatch: { name: { $in: etiquetas } } },
+                },
+              },
+              {
+                // Ordenamos por fecha de lanzamiento
+                $sort: { released: 1 }, // 1 para orden ascendente, -1 para descendente
+              },
+              {//hacemos project para los atributos relevantes
+                $project: {
+                    id: 1,
+                    name: 1,
+                    slug: 1,
+                    released: 1,
+                    tags:1,
+                    // tagsName: {
+                    //   $map: {
+                    //     input: "$tags", // Arreglo de entrada a la función map
+                    //     as: "$t", // Alias para cada elemento del arreglo
+                    //     in: "$$t.name"}
+                    //   }
+                    // }
+                  }
+                  
+              }
+            ];
+        
+            // Ejecuta la consulta y devuelve los juegos encontrados
+            const r = await collection.aggregate(pipeline).toArray();
+        
+            return r;
+          } catch (error) {
+            console.log(error.message);
+          }
 
     }
 
