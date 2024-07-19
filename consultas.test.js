@@ -81,13 +81,13 @@ describe('Consultas', () => {
     //     expect(result).not.toEqual([]);
     // });
 
-    // test('Consulta 8: Retorna un array de juegos con la palabra clave en su nombre', async () => {
-    //     const palabra = undefined; // Agregar una palabra como por ejemplo 'WAR'
-    //     const result = await client.consulta8(etiquetas); 
-    //     console.info('Consulta 8: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 8: Retorna un array de juegos con la palabra clave en su nombre', async () => {
+        const palabra = 'call'; // Agregar una palabra como por ejemplo 'WAR'
+        const result = await client.consulta8(palabra); //Decia etiquetas!
+        console.info('Consulta 8: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
     // test('Consulta 9: Retorna el top 5 juegos mejor calificados por género específico y excluyendo ciertos empresas desarrolladoras', async () => {
     //     const generos = []; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']

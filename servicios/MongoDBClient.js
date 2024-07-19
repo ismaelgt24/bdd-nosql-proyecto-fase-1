@@ -389,14 +389,37 @@ class MongoDBClient {
      */
 
     async consulta8(palabra){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
+        // Valida que se proporcione una palabra clave
+        if (!palabra || typeof palabra !== "string") {
+          throw new Error("Debes proporcionar una palabra clave válida");
+        }
+      
+        const collection = this.db.collection("Videojuego");
 
-    }
+        // Crea una expresión regular para buscar la palabra clave (ignora mayúsculas/minúsculas)
+        const regex = new RegExp(palabra, 'i');
+      
+        // Busca juegos donde el nombre coincida con la expresión regular
+        // const query = { name: { $regex: regex } };
+      
+        // Ejecuta la consulta y devuelve los juegos encontrados
+        const r = await collection.aggregate([
+            {//Los juegos deben contener la palabra en su nombre
+                $match: {
+                    name: { $regex: RegExp(palabra, 'i') }
+                    //Esta Regex es para buscar el nombre sin tomar en cuenta las mayusculas
+                }
+            },
+            {   //Proyectamos solo los atributos relevantes 
+                //para validar las salidas de la consulta
+                $project: {
+                    id: 1,
+                    name: 1
+                }
+            }
+        ]).toArray();
+        return r;
+      }
 
     /**
      * Top 5 juegos mejor calificados por género específico y excluyendo ciertos empresas desarrolladoras
