@@ -40,13 +40,13 @@ describe('Consultas', () => {
         expect(result).not.toEqual([]);
     });
 
-    // test('Consulta 3: Devuelve un array con juegos lanzados entre fechas, de n empresas', async () => {
-    //     const cantidadDePlataformas = undefined; // Agregar un numero, por favor que sea mas de 1
-    //     const result = await client.consulta3(cantidadDePlataformas); 
-    //     console.info('Consulta 3: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 3: Devuelve un array con juegos lanzados entre fechas, de n empresas', async () => {
+        const cantidadDePlataformas = 5; //Probaremos con 5 plataformas!
+        const result = await client.consulta3(cantidadDePlataformas); 
+        console.info('Consulta 3: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
     // test('Consulta 4: Retorna un  juegos por n empresas desarrolladoras con valoración mayor a x', async () => {
     //     const empresas = []; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']

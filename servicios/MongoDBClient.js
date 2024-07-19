@@ -184,13 +184,44 @@ class MongoDBClient {
      */
 
     async consulta3(cantidadDePlataformas){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
 
+            const collection = this.db.collection("Videojuego");
+
+            const r = await collection.aggregate([
+                {
+
+                    //Solo los videojuegos que esten para mas de 'cantidadDePlataformas' plataformas
+                    $match: {
+                        //$id: 405,
+                        $expr: {
+                            $gt: [
+                                { $size: "$platforms" },
+                                cantidadDePlataformas
+                            ]
+                        }
+                    }
+                },
+                {   //hacemos el match para cada plataforma disponible
+                    $lookup: {
+                        from: 'Plataforma',
+                        localField: 'platforms',
+                        foreignField: 'id',
+                        as: 'platformsData'
+                    }
+                },
+                {   //Proyectamos los atributos importantes
+                    $project: {
+                        id:1,
+                        DeveloperID:1,
+                        name:1,
+                        slug:1,
+                        platformsData:1
+                    }
+                }
+            ]).toArray();
+
+            
+            return r;
     }
 
     /**
