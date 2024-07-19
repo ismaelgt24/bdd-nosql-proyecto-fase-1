@@ -374,12 +374,45 @@ class MongoDBClient {
      */
 
     async consulta7(generos){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
+
+        // Valida que se proporcione un arreglo de géneros válido
+        if (!generos || !generos.length || !generos.every(genero => typeof genero === "string")) {
+            throw new Error("Debes proporcionar un arreglo válido de nombres de géneros (strings)");
+        }
+
+        // Pipeline de agregación para calcular el promedio de calificación por género
+        const pipeline = [
+            {   //tomamos en cuenta los juegos que pertenezcan al conjunto de generos dado:
+                $match: {
+                    genres: { $elemMatch: { name: { $in: generos } } },
+                  }
+            },
+            {   //Desempaquetamos cada juego por genero:
+                $unwind : "$genres"
+            },
+            {   //Claculamos el promedio de los ratings agrupando por genero
+                $group: {
+                    _id: "$genres.name",
+                    avgRating : {$avg: "$rating"}
+                }
+            },
+            {   //Este project es para mejorar la lectura en el test:
+                $project: {
+                    _id:0,
+                    avgRating:1,
+                    genreName: "$_id",
+                    
+                }
+            }
+
+        ];
+
+        // Obtenemos la colección
+        const collection = this.db.collection("Videojuego");
+
+        // Ejecuta la agregación y combina los resultados
+        const r = await collection.aggregate(pipeline).toArray();
+        return r;
 
     }
 

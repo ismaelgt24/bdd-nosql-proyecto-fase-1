@@ -73,13 +73,13 @@ describe('Consultas', () => {
         expect(result).not.toEqual([]);
     });
 
-    // test('Consulta 7: Retorna un array con los generos y su valoracion promedi.', async () => {
-    //     const generos = []; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']
-    //     const result = await client.consulta7(etiquetas); 
-    //     console.info('Consulta 7: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 7: Retorna un array con los generos y su valoracion promedi.', async () => {
+        const generos = ['Action', 'Adventure', 'FPS']; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']
+        const result = await client.consulta7(generos); 
+        console.info('Consulta 7: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
     test('Consulta 8: Retorna un array de juegos con la palabra clave en su nombre', async () => {
         const palabra = 'call'; // Agregar una palabra como por ejemplo 'WAR'
