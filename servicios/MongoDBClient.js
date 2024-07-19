@@ -230,13 +230,46 @@ class MongoDBClient {
      */
 
     async consulta4(empresas, valoracion){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
 
+        const collection = this.db.collection("Empresa");
+
+        const r = collection.aggregate([
+            {//Tomamos en cuenta solo las empresas cuyo nombre esten en el array pasado por parametros
+                $match: {
+                    name: { $in: empresas }
+                }
+            },
+            {//Juntamos Empresas y VideoJuegos
+                $lookup: {
+                    from: 'Videojuego',
+                    localField: 'id',
+                    foreignField: 'DeveloperID',
+                    as: 'Videojuegos'
+                }
+            },
+            {//Desempaquetamos por videojuegos para poder contar los juegos
+                $unwind: '$Videojuegos'
+            },
+            {//Filtramos los juegos despues de desempaquetar
+                $match: {
+                    $expr: {
+                        $gt: ['$Videojuegos.rating',valoracion]//error rating not defined
+                    }
+                }
+            },
+            {//Esta proyeccion es para poder visualizar mejor al probar
+                $project: {
+                  empresa: '$name', 
+                  VideoGame: "$Videojuegos.name"
+                }
+            },
+            {//Contamos los videojuegos pertenecientes a las empresas con un rating mayor al indicado
+                $count: "CantidadTotalDeJuegos"
+            }
+
+        ]).toArray();
+
+        return r;
     }
 
     /**

@@ -29,7 +29,7 @@ describe('Consultas', () => {
     test('Consulta 2: Devuelve un array con juegos lanzados entre fechas, de n empresas', async () => {
 
         //Usaremos las empresas dadas de ejemplo:
-        const empresas = ['Nintendo', 'Activision', 'EA']; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
+        const empresas = ['Nintendo', 'Ubisoft']; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
 
         //Fechas para juegos del todo el 2023
         const fechaInicio = new Date(2023, 1, 1); // Agregar fecha por ejemplo 1/10/2012
@@ -48,14 +48,14 @@ describe('Consultas', () => {
         expect(result).not.toEqual([]);
     });
 
-    // test('Consulta 4: Retorna un  juegos por n empresas desarrolladoras con valoración mayor a x', async () => {
-    //     const empresas = []; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
-    //     const valoracion = undefined; // Agregar un numero, por ejemplo 7.3
-    //     const result = await client.consulta4(empresas, valoracion); 
-    //     console.info('Consulta 4: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 4: Retorna un  juegos por n empresas desarrolladoras con valoración mayor a x', async () => {
+        const empresas = ['Nintendo', 'Activision', 'EA']; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
+        const valoracion = 0; // Agregar un numero, por ejemplo 7.3
+        const result = await client.consulta4(empresas, valoracion); 
+        console.info('Consulta 4: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
     // test('Consulta 5: Retorna juegos con una calificación mayor al promedio y que tengan mas de n generos', async () => {
     //     const cantidadDeGeneros = undefined; // Agregar un numero, por ejemplo 3
