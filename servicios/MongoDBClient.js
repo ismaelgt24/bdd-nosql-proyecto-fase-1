@@ -146,25 +146,25 @@ class MongoDBClient {
                 },
                 {   //Buscamos asociar cada juego son su empresa desarrolladores
                     $lookup: {
-                        from: 'Empresa',
-                        localField: 'DeveloperID',
-                        foreignField: 'id',
-                        as: 'Empresa'
+                        from: "Empresa",
+                        localField: "DeveloperID",
+                        foreignField: "id",
+                        as: "Empresa"
                     }
                 },
                 {//Tomamos en cuenta solo las empresas cuyo nombre esten en el array pasado por parametros
                     $match: {
-                        'Empresa.name': { $in: empresas }
+                        "Empresa.name": { $in: empresas }
                     }
                 },
                 {//Tomamos solamente los atributos relevantes
                     $project: {
-                        gameID : '$id',
-                        gameSlug : '$slug',
-                        gameName: '$name',
-                        gameReleaseDate : '$released',
-                        EmpresaName: '$Empresa.name',
-                        EmpresaID: 'Empresa.id'
+                        gameID : "$id",
+                        gameSlug : "$slug",
+                        gameName: "$name",
+                        gameReleaseDate : "$released",
+                        EmpresaName: "$Empresa.name",
+                        EmpresaID: "Empresa.id"
                     }
                 }
             ]).toArray();
@@ -194,19 +194,16 @@ class MongoDBClient {
                     $match: {
                         //$id: 405,
                         $expr: {
-                            $gt: [
-                                { $size: "$platforms" },
-                                cantidadDePlataformas
-                            ]
+                            $gt: [{ $size: "$platforms" },cantidadDePlataformas]
                         }
                     }
                 },
                 {   //hacemos el match para cada plataforma disponible
                     $lookup: {
-                        from: 'Plataforma',
-                        localField: 'platforms',
-                        foreignField: 'id',
-                        as: 'platformsData'
+                        from: "Plataforma",
+                        localField: "platforms",
+                        foreignField: "id",
+                        as: "platformsData"
                     }
                 },
                 {   //Proyectamos los atributos importantes
@@ -233,7 +230,7 @@ class MongoDBClient {
 
         const collection = this.db.collection("Empresa");
 
-        const r = collection.aggregate([
+        const r = await collection.aggregate([
             {//Tomamos en cuenta solo las empresas cuyo nombre esten en el array pasado por parametros
                 $match: {
                     name: { $in: empresas }
@@ -241,25 +238,25 @@ class MongoDBClient {
             },
             {//Juntamos Empresas y VideoJuegos
                 $lookup: {
-                    from: 'Videojuego',
-                    localField: 'id',
-                    foreignField: 'DeveloperID',
-                    as: 'Videojuegos'
+                    from: "Videojuego",
+                    localField: "id",
+                    foreignField: "DeveloperID",
+                    as: "Videojuegos"
                 }
             },
             {//Desempaquetamos por videojuegos para poder contar los juegos
-                $unwind: '$Videojuegos'
+                $unwind: "$Videojuegos"
             },
             {//Filtramos los juegos despues de desempaquetar
                 $match: {
                     $expr: {
-                        $gt: ['$Videojuegos.rating',valoracion]//error rating not defined
+                        $gt: ["$Videojuegos.rating",valoracion]//error rating not defined
                     }
                 }
             },
             {//Esta proyeccion es para poder visualizar mejor al probar
                 $project: {
-                  empresa: '$name', 
+                  empresa: "$name", 
                   VideoGame: "$Videojuegos.name"
                 }
             },
@@ -278,12 +275,39 @@ class MongoDBClient {
      */
 
     async consulta5(cantidadDeGeneros){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
+
+        const collection = this.db.collection("Videojuego");        
+
+        const r = await collection.aggregate([
+            {//Esto es para calcular el promedio del rating de todos los documentos de la coleccion videojuegos y mantener ese campo en una "variable"
+                $setWindowFields: {
+                    output: {
+                        avgRating: { $avg: "$rating" }
+                    }
+                }
+            },
+            {   //Evaluamos que se cumplan las 2 condiciones
+                $match: {
+                    $expr: {
+                        $and: [
+                            { $lt: [cantidadDeGeneros, { $size: "$genres" }] },//Mas de X generos
+                            { $gt: ["$rating", "$avgRating"] }//Rating meyor al promedio
+                        ]
+                    }
+                }
+            },
+            {
+                $project: {
+                    id: 1,
+                    name: 1,
+                    rating:1,
+                    avgRating:1,
+                    genresCount: { $size: "$genres" }
+                }
+            }
+        ]).toArray();
+
+        return r
 
     }
 

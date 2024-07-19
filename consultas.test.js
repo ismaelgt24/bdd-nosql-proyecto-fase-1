@@ -57,13 +57,13 @@ describe('Consultas', () => {
         expect(result).not.toEqual([]);
     });
 
-    // test('Consulta 5: Retorna juegos con una calificación mayor al promedio y que tengan mas de n generos', async () => {
-    //     const cantidadDeGeneros = undefined; // Agregar un numero, por ejemplo 3
-    //     const result = await client.consulta5(cantidadDeGeneros); 
-    //     console.info('Consulta 5: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 5: Retorna juegos con una calificación mayor al promedio y que tengan mas de n generos', async () => {
+        const cantidadDeGeneros = 3; // Agregar un numero, por ejemplo 3
+        const result = await client.consulta5(cantidadDeGeneros); 
+        console.info('Consulta 5: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
     // test('Consulta 6: Retorna juegos con etiquetas específicas y ordenados por fecha de lanzamientos', async () => {
     //     const etiquetas = []; // Agregar empresas a esta lista, por ejemplo ['Multiplayer', 'Singleplayer']
