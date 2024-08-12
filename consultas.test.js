@@ -89,23 +89,23 @@ describe('Consultas', () => {
         expect(result).not.toEqual([]);
     });
 
-    // test('Consulta 9: Retorna el top 5 juegos mejor calificados por género específico y excluyendo ciertos empresas desarrolladoras', async () => {
-    //     const generos = []; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']
-    //     const empresas = []; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
-    //     const result = await client.consulta9(generos, empresas); 
-    //     console.info('Consulta 9: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 9: Retorna el top 5 juegos mejor calificados por género específico y excluyendo ciertos empresas desarrolladoras', async () => {
+        const generos = ['Action', 'Adventure', 'FPS']; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']
+        const empresas = ['Nintendo', 'Activision', 'EA']; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
+        const result = await client.consulta9(generos, empresas); 
+        console.info('Consulta 9: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
-    // test('Consulta 10: Retorna juegos por géneros y plataformas con proyección de campos', async () => {
-    //     const generos = []; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']
-    //     const plataformas = []; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
-    //     const result = await client.consulta9(generos, plataformas); 
-    //     console.info('Consulta 10: ', result)
-    //     expect(result).toBeInstanceOf(Array); 
-    //     expect(result).not.toEqual([]);
-    // });
+    test('Consulta 10: Retorna juegos por géneros y plataformas con proyección de campos', async () => {
+        const generos = ['Action', 'Adventure', 'FPS']; // Agregar generos a esta lista, por ejemplo ['Action', 'Adventure', 'FPS']
+        const plataformas = ['Nintendo', 'Activision', 'EA']; // Agregar empresas a esta lista, por ejemplo ['Nintendo', 'Activision', 'EA']
+        const result = await client.consulta9(generos, plataformas); 
+        console.info('Consulta 10: ', result)
+        expect(result).toBeInstanceOf(Array); 
+        expect(result).not.toEqual([]);
+    });
 
 
 

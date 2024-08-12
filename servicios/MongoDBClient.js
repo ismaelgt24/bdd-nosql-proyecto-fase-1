@@ -38,6 +38,74 @@ class MongoDBClient {
     }
 
 
+    //Metodos para obtener los elementos de las colecciones:
+
+    async getVideojuegos(){
+        const collection = await this.db.collection('Videojuego');
+        return collection.find().toArray();
+    }
+
+    async getEmpresas(){
+        const collection = await this.db.collection('Empresa');
+        return collection.find().toArray();
+    }
+
+    async getPlataformas(){
+        const collection = await this.db.collection('Plataforma');
+        return collection.find().toArray();
+    }
+
+    async getGeneros(){
+        const collection = await this.db.collection('Videojuego');
+
+        let pipeline = [
+            { $unwind: "$genres" },// Desenvuelve el array de géneros 
+            { $group: { _id: "$genres.name" }},// Agrupa por el nombre del género
+            { $project: {
+                _id: 0,
+                name: "$_id" // Renombra _id a genero
+              }
+            }
+        ];
+
+        // let pipeline2 = [
+        //     { $project: { genres: { $map: { input: "$genres", in: "$$this.name" } } } }, // Extrae el nombre de cada tag
+        //     { $unwind: "$genres" }, // Desenvuelve el array de nombres
+        //     { $group: { _id: "$genres" } }, // Agrupa por nombre de etiqueta
+        //     { $project: { _id: 0, name: "$_id" } } // Renombra _id a name
+        // ];
+        const r  = await collection.aggregate(pipeline).toArray();
+        return r;
+    }
+
+    async getTags(){
+        const collection = await this.db.collection('Videojuego');
+        let pipeline = [
+            { $project: { tags: { $map: { input: "$tags", in: "$$this.name" } } } }, // Extrae el nombre de cada tag
+            { $unwind: "$tags" }, // Desenvuelve el array de nombres
+            { $group: { _id: "$tags" } }, // Agrupa por nombre de etiqueta
+            { $project: { _id: 0, name: "$_id" } } // Renombra _id a name
+        ];
+        // agregationPipeline = [
+        //     {
+        //       $unwind: "$tags" // Desenvuelve el array de géneros
+        //     },
+        //     {
+        //       $group: {
+        //         _id: "$tags.name" // Agrupa por el nombre del género
+        //       }
+        //     },
+        //     {
+        //       $project: {
+        //         name:1,
+        //         slug:0
+        //       }
+        //     }
+        //   ];
+        const r  = await collection.aggregate(pipeline).toArray();
+        return r;
+    }
+
     /**
      * Consulta de ejemplo
      * 
@@ -129,7 +197,7 @@ class MongoDBClient {
      * 
      */
 
-    async consulta2(empresas, fechaInicio, fechaFin){
+    async consulta2(Plataformas, fechaInicio, fechaFin){
 
         try{
             const collection = this.db.collection("Videojuego");
@@ -460,12 +528,58 @@ class MongoDBClient {
      */
 
     async consulta9(generos, empresas){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
+        
+        // Pipeline de agregación para calcular el promedio de calificación por género
+        const pipeline = [
+            {   //tomamos en cuenta los juegos que pertenezcan al conjunto de generos dado:
+                $match: {
+                    genres: { $elemMatch: { name: { $in: generos } } },
+                  }
+            },
+            {
+                $lookup: {
+                    from: "Empresa",
+                    localField: "DeveloperID",
+                    foreignField: "id",
+                    as: "Empresa"
+                }
+            },
+            // {   //Desempaquetamos cada juego por genero:
+            //     $unwind : "$Empresa"
+            // },
+            {   //Desempaquetamos cada juego por genero:
+                $unwind : "$genres"
+            },
+            {   //tomamos en cuenta los juegos que pertenezcan al conjunto de generos dado:
+                $match: {
+                    "$Empresa.name": { $nin: empresas }                  
+                }
+            },
+            {   //Claculamos el promedio de los ratings agrupando por genero
+                $group: {
+                    _id: "$genres.name",
+                    ranking : {$avg: "$rating"}
+                }
+            },
+            {   //Este project es para mejorar la lectura en el test:
+                $project: {
+                    _id:0,
+                    avgRating:1,
+                    genreName: "$_id",
+                    EmpresaName: "$Empresa.name"
+                    
+                }
+            }
+
+        ];
+
+        // Obtenemos la colección
+        const collection = this.db.collection("Videojuego");
+
+        // Ejecuta la agregación y combina los resultados
+        const r = await collection.aggregate(pipeline).toArray();
+        return r;
+
 
     }
 
@@ -475,12 +589,71 @@ class MongoDBClient {
      */
 
     async consulta10(generos, plataformas){
-        /**
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        CODIGO AQUI
-        >>>>>>>>>>>>>>>>>>>>>>>>
-        */
-        return []
+
+        // const pipeline = [
+            // {   //tomamos en cuenta los juegos que pertenezcan al conjunto de generos dado:
+            //     $match: {
+            //         genres: { $elemMatch: { name: { $in: generos } } },
+            //       }
+            // },
+            // {   //hacemos el match para cada plataforma disponible
+            //     $lookup: {
+            //         from: "Plataforma",
+            //         localField: "platforms",
+            //         foreignField: "id",
+            //         as: "platformsData"
+            //     }
+            // },
+            // {   //tomamos en cuenta los juegos que pertenezcan al conjunto de generos dado:
+            //     $match: {
+            //         platformsData: { $elemMatch: { name: { $in: generos } } },
+            //       }
+            // },
+            // {   //Proyectamos los atributos importantes
+            //     $project: {
+            //         id:1,
+            //         DeveloperID:1,
+            //         name:1,
+            //         slug:1,
+            //         platformsData:1
+            //     }
+            // }
+        // ];
+
+        // Obtenemos la colección
+        const collection = this.db.collection("Videojuego");
+        
+        // Ejecuta la agregación y combina los resultados
+        const r = await collection.aggregate([
+            {   //tomamos en cuenta los juegos que pertenezcan al conjunto de generos dado:
+                $match: {
+                    genres: { $elemMatch: { name: { $in: generos } } },
+                  }
+            },
+            {   //hacemos el match para cada plataforma disponible
+                $lookup: {
+                    from: "Plataforma",
+                    localField: "platforms",
+                    foreignField: "id",
+                    as: "platformsData"
+                }
+            },
+            {   //tomamos en cuenta los juegos que pertenezcan al conjunto de generos dado:
+                $match: {
+                    platformsData: { $elemMatch: { name: { $in: generos } } },
+                  }
+            },
+            {   //Proyectamos los atributos importantes
+                $project: {
+                    id:1,
+                    DeveloperID:1,
+                    name:1,
+                    slug:1,
+                    platformsData:1
+                }
+            }
+        ]).toArray();
+        return r;
 
     }
 
